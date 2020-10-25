@@ -1,1 +1,0 @@
-# polygon_image_trace

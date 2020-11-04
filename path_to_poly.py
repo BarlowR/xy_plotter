@@ -6,9 +6,14 @@ import copy
 
 
 
-def path_to_polygon(path, distance_threshold):
+def path_to_polygon(path, distance_threshold=-1):
 	#path must have min length of 3
+
 	
+	# if the threshold value isn't given, compute it based on path length. These constants seem to work relatively well in practice
+	if (distance_threshold == -1):
+		distance_threshold = int(np.sqrt(len(path))/20)+.2
+
 	error_sum = 0
 	max_error_sum = -1
 	best_approx = {}
@@ -19,11 +24,11 @@ def path_to_polygon(path, distance_threshold):
 
 
 		#we want to try a couple different starting nodes, as the first node in the path is never removed from the set.  
-		starting_node_num = len(path)/10
+		starting_node_num = 1
 		if starting_node_num > 50: starting_node_num = 50;
 
 
-		if (node_from_start > len(path)/10):
+		if (node_from_start > starting_node_num):
 			break
 		else:	
 			node_from_start += 1
@@ -38,6 +43,8 @@ def path_to_polygon(path, distance_threshold):
 		
 		#iterate through all nodes and look for lines between that can approximate intermediate nodes within the given threshold. 
 		while not closed:
+			loading_bar = int(10*(1- len(minimized_path)/len(path))) * "#"
+			#print(loading_bar)
 
 			#set our initial mid and end points along the path
 			midP = minimized_path[P1]
@@ -49,6 +56,7 @@ def path_to_polygon(path, distance_threshold):
 
 			# while we haven't exceded our max node to line distance, figure out the sum of distance of points between P1 and P2 
 			while max_node_distance < (distance_threshold**2) and P1 != P2:
+				#print("max_node_distance < (distance_threshold**2) and P1 != P2")
 
 				#reset max_node_distance
 				max_node_distance = 0
@@ -56,7 +64,9 @@ def path_to_polygon(path, distance_threshold):
 
 				#iterate aolong all midpoints between P1 and P2
 				while midP != P2:
-
+					#print("midP != P2")
+					#print(len(minimized_path))
+					
 					#calculate distance_squared from the midpoint to the line (P1 to P2)
 					midP_dist = dist_squared_point_to_line(P1, P2, midP)
 
@@ -70,10 +80,8 @@ def path_to_polygon(path, distance_threshold):
 					midP = minimized_path[midP]
 
 				
-				
 
-				#check if we have a closed path yet
-				
+				#check if we have a closed path			
 				if P2 == start_node: 
 					#print("closed")
 					closed = True
@@ -81,11 +89,17 @@ def path_to_polygon(path, distance_threshold):
 
 				#set the endpoint to the next node in the path	
 				P2 = minimized_path[P2]	
+				
 
 				#set the intermediate point to the node after the start node
 				midP = minimized_path[P1]
 			
-			
+			#check if we have a closed path
+			if P2 == start_node: 
+					#print("closed")
+					closed = True
+					break
+
 			#once we exit from the while loop, check if (sqrt(max_node_distance) has excedded the threshold. If so, , make a new node from P1 to P2 and remove all nodes between P1 and P2
 			if (max_node_distance > (distance_threshold**2)):
 				minimized_path[P1] = P2
@@ -96,7 +110,6 @@ def path_to_polygon(path, distance_threshold):
 					midP = midPtemp
 			elif (P1 == P2): 
 				print("We really shouldn't be here")
-				print(len(minimized_path))
 				closed = True
 
 			#increase our path error sum by our line error sum
@@ -117,7 +130,7 @@ def path_to_polygon(path, distance_threshold):
 			element1 = minimized_path[start_node] 
 
 		#print(error_sum)
-	print(max_error_sum/len(best_approx))
+	#print(max_error_sum/len(best_approx))
 	return (best_approx)
 			
 
@@ -142,7 +155,7 @@ def dist_squared_point_to_line(P1, P2, midP):
 def plot_polygon(path, ax, linewidth = 2, clr = "blue"):
 	polygon = []
 	for node in path:
-		polygon.append(np.asarray(node))
+		polygon.append(np.asarray(node)-.5)
 	poly = patches.Polygon(polygon, fill = False, ls = '-', closed = True, lw = linewidth, color = clr)
 	ax.add_patch(poly)
 

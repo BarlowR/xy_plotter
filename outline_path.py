@@ -37,12 +37,13 @@ vertex_shift = {
 
 
 	#Recursively finds all paths along black/white borders within the image given, and returns them as a list of directed graphs. 	
-def outline_outer_image(img, path_num = -1, min_path_length = 0):
+def outline_outer_image(img, path_num = -1, min_path_length = -1):
 	#img is a numpy boolean array of a black and white image, where black pixels are 1 and white pixels are 0. 
 	#path_num defines max number of paths to return. 
 	#min_path_length defines the minimum path length to include in the resulting path list
 
-
+	if (min_path_length == -1): 
+		min_path_length = (img.shape[0]+img.shape[1])/5
 	path = {}
 
 	#Grab top leftmost vertex along a border
@@ -52,9 +53,13 @@ def outline_outer_image(img, path_num = -1, min_path_length = 0):
 
 	# if there exist any pixels to trace and we don't already have enough paths, trace the outline of the path
 	#else, return an empty list
+
 	if (current_vertex is not None and path_num != 0):
 
-		print("starting path")
+		if (path_num > 0):
+			print("#" * path_num)
+		else:
+			print("starting path")
 
 		#setup the path tracing variables
 		first_vertex = current_vertex
@@ -73,6 +78,7 @@ def outline_outer_image(img, path_num = -1, min_path_length = 0):
 		# run this loop while we have a closed loop in our path
 
 		while True:
+
 
 			#take a 2x2 grid of pixels surrounding our current vertex and rotate it to our path-tracing direction
 			rotated_grid = dir_trans(current_theta, current_grid)
@@ -115,8 +121,7 @@ def outline_outer_image(img, path_num = -1, min_path_length = 0):
 		if len(path) > min_path_length:
 			return_list += [path]
 			path_num -= 1
-		else:
-			print("path too short")	
+		#else: print("path too short")	
 
 		# Recursively calculate the next outline
 		if path_num > 0:
@@ -257,21 +262,35 @@ def cull_paths(paths, num_to_keep):
 
 if __name__ == "__main__":
 
-	image = Image.open('Contour2.jpg')
+	image = Image.open('man.jpg')
 	plt.subplot(1,2,1)
 	plt.imshow(image, 'gray')
-	img_array = img_to_bool_array(image, 90)
+	img_array = img_to_bool_array(image, 180)
 	ax = plt.subplot(1,2,2)
 	plt.imshow(img_array, 'gray')
+
 	
-	paths = outline_outer_image(img_array, path_num = 3, min_path_length = 200)
-	
+	paths = outline_outer_image(img_array, min_path_length = 3)
+
+
+	total_initial_length = 0
+	total_minimized_length = 0
+	loading = ""
+
 	for path in paths:
-		print(len(path))
-		short_path = p2p.path_to_polygon(path, 1)
-		print(len(short_path))
-		outline_path(path, clr = (1, 0,0, 0.1))
+		loading += "#"
+		print(loading + "path length " + str(len(path)))
+
+		short_path = p2p.path_to_polygon(path, 0.2)
+		total_initial_length += len(path)
+
+		total_minimized_length += len(short_path)
+		
+		#outline_path(path, clr = (1, 0,0, 0.1))
+		
 		p2p.plot_polygon(short_path, ax)
+
+	print(total_minimized_length/total_initial_length)
 	plt.show()
 	#print(paths)'''
 

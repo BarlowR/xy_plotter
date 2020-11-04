@@ -2,6 +2,8 @@ import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
 
+import path_to_poly as p2p
+
 
 
 
@@ -235,9 +237,9 @@ def invert_closed_path(path, img):
 
 #take a path and scatter plot all nodes. Useful for visualizing the path ontop of the initial image
 
-def outline_path(path):
+def outline_path(path, clr):
 	for node in path:
-		plt.scatter(node[0]-.5, node[1]-.5, color = 'red')	
+		plt.scatter(node[0]-.5, node[1]-.5, color = clr)	
 
 #return n = num_to_keep longest paths in the list of paths. 
 
@@ -250,7 +252,7 @@ def cull_paths(paths, num_to_keep):
 
 if __name__ == "__main__":
 
-	image = Image.open('flamingo.jpg')
+	image = Image.open('imageSmall.png')
 	plt.subplot(1,2,1)
 	plt.imshow(image, 'gray')
 	img_array = img_to_bool_array(image, 200)
@@ -259,11 +261,15 @@ if __name__ == "__main__":
 
 
 	paths = outline_outer_image(img_array, min_path_length = 10)
-	paths = cull_paths(paths, 6)
+	paths = cull_paths(paths, 1)
 	
+	print(p2p.dist_squared_point_to_line((0,0), (10, 0), (0, 5)))
+
 	for path in paths:
-		print(len(path))
-		outline_path(path)
+		#print(path)
+		short_path = p2p.path_to_polygon(path, 1)
+		outline_path(path, clr = 'red')
+		outline_path(short_path, clr = 'blue')
 
 	plt.show()
 	#print(paths)

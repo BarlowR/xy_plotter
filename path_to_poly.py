@@ -1,6 +1,7 @@
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import copy
 
 
@@ -12,23 +13,35 @@ def path_to_polygon(path, distance_threshold):
 	max_error_sum = -1
 	best_approx = {}
 
+	node_from_start = 0
+
 	for node in path:
+
+
+		#we want to try a couple different starting nodes, as the first node in the path is never removed from the set.  
+		starting_node_num = len(path)/10
+		if starting_node_num > 50: starting_node_num = 50;
+
+
+		if (node_from_start > len(path)/10):
+			break
+		else:	
+			node_from_start += 1
+
+
 		#reset our variables
 		minimized_path = copy.deepcopy(path)
-		print(" ")
-		print(minimized_path)
 		start_node = node
 		P1 = node
 		error_sum = 0
 		closed = False;
 		
-		#iterate through nodes, removing nodes if they are within a certain distance of a line from a prior to a later node
+		#iterate through all nodes and look for lines between that can approximate intermediate nodes within the given threshold. 
 		while not closed:
-
 
 			#set our initial mid and end points along the path
 			midP = minimized_path[P1]
-			P2 = minimized_path[midP]
+			P2 = midP
 
 			max_node_distance = 0
 
@@ -56,40 +69,35 @@ def path_to_polygon(path, distance_threshold):
 					#move the midpoint along to the next vertex on the path
 					midP = minimized_path[midP]
 
-				#set the endpoint to the next node in the path
-				P2 = minimized_path[P2]
+				
+				
 
 				#check if we have a closed path yet
 				
-				print(P1)
-				print(midP)
-				print(P2)
-				print(start_node)
-				print(minimized_path[start_node])
-				print(" ")
 				if P2 == start_node: 
-					print("closed")
+					#print("closed")
 					closed = True
 					break
+
+				#set the endpoint to the next node in the path	
+				P2 = minimized_path[P2]	
 
 				#set the intermediate point to the node after the start node
 				midP = minimized_path[P1]
 			
-			#once we exit from the while loop (sqrt(max_node_distance) has excedded the threshold), make a new node from P1 to P2
-			minimized_path[P1] = P2
-
-			#remove all nodes between P1 and P2
 			
-			while midP != P2:
-
-				'''print(P1)
-				print(midP)
-				print(P2)
-				print(" ")'''
-
-				midPtemp = minimized_path[midP]
-				minimized_path.pop(midP)
-				midP = midPtemp
+			#once we exit from the while loop, check if (sqrt(max_node_distance) has excedded the threshold. If so, , make a new node from P1 to P2 and remove all nodes between P1 and P2
+			if (max_node_distance > (distance_threshold**2)):
+				minimized_path[P1] = P2
+				
+				while midP != P2:
+					midPtemp = minimized_path[midP]
+					minimized_path.pop(midP)
+					midP = midPtemp
+			elif (P1 == P2): 
+				print("We really shouldn't be here")
+				print(len(minimized_path))
+				closed = True
 
 			#increase our path error sum by our line error sum
 			error_sum += line_error_sum
@@ -97,14 +105,19 @@ def path_to_polygon(path, distance_threshold):
 			#set our new starting node
 			P1 = P2
 
+
+
 		#once we have a closed loop, check if our total error is less than the previous approximations. 
 		#if it is, save the new minimized total error and the minimized path network
 		if error_sum < max_error_sum or max_error_sum == -1:
 			max_error_sum = error_sum
 			best_approx = minimized_path
 
-		break
-	print(max_error_sum)
+
+			element1 = minimized_path[start_node] 
+
+		#print(error_sum)
+	print(max_error_sum/len(best_approx))
 	return (best_approx)
 			
 
@@ -125,4 +138,11 @@ def dist_squared_point_to_line(P1, P2, midP):
 	distance_squared_p1_to_p2 = (y2-y1)**2 + (x2-x1)**2
 
 	return area_squared_of_triangle/distance_squared_p1_to_p2
+
+def plot_polygon(path, ax, linewidth = 2, clr = "blue"):
+	polygon = []
+	for node in path:
+		polygon.append(np.asarray(node))
+	poly = patches.Polygon(polygon, fill = False, ls = '-', closed = True, lw = linewidth, color = clr)
+	ax.add_patch(poly)
 

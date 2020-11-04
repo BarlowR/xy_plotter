@@ -49,9 +49,12 @@ def outline_outer_image(img, path_num = -1, min_path_length = 0):
 	current_vertex = find_start_vertex(img)
 
 
+
 	# if there exist any pixels to trace and we don't already have enough paths, trace the outline of the path
 	#else, return an empty list
 	if (current_vertex is not None and path_num != 0):
+
+		print("starting path")
 
 		#setup the path tracing variables
 		first_vertex = current_vertex
@@ -112,6 +115,8 @@ def outline_outer_image(img, path_num = -1, min_path_length = 0):
 		if len(path) > min_path_length:
 			return_list += [path]
 			path_num -= 1
+		else:
+			print("path too short")	
 
 		# Recursively calculate the next outline
 		if path_num > 0:
@@ -252,27 +257,23 @@ def cull_paths(paths, num_to_keep):
 
 if __name__ == "__main__":
 
-	image = Image.open('imageSmall.png')
+	image = Image.open('Contour2.jpg')
 	plt.subplot(1,2,1)
 	plt.imshow(image, 'gray')
-	img_array = img_to_bool_array(image, 200)
-	plt.subplot(1,2,2)
+	img_array = img_to_bool_array(image, 90)
+	ax = plt.subplot(1,2,2)
 	plt.imshow(img_array, 'gray')
-
-
-	paths = outline_outer_image(img_array, min_path_length = 10)
-	paths = cull_paths(paths, 1)
 	
-	print(p2p.dist_squared_point_to_line((0,0), (10, 0), (0, 5)))
-
+	paths = outline_outer_image(img_array, path_num = 3, min_path_length = 200)
+	
 	for path in paths:
-		#print(path)
+		print(len(path))
 		short_path = p2p.path_to_polygon(path, 1)
-		outline_path(path, clr = 'red')
-		outline_path(short_path, clr = 'blue')
-
+		print(len(short_path))
+		outline_path(path, clr = (1, 0,0, 0.1))
+		p2p.plot_polygon(short_path, ax)
 	plt.show()
-	#print(paths)
+	#print(paths)'''
 
 
 

@@ -22,13 +22,8 @@ def scale_path(path, max_width, max_height, bounds = None):
 	
 	scale = 1
 	scaled_path = {}
-
-
 	
-
-	
-
-	print(min_x, min_y, max_x, max_y)
+	#print(min_x, min_y, max_x, max_y)
 
 	path_width = max_x - min_x
 	path_height = max_y - min_y
@@ -64,13 +59,13 @@ def scale_path(path, max_width, max_height, bounds = None):
 
 
 
-def scale_all_paths(paths, max_width, max_height, bounds = None)
+def scale_all_paths(paths, max_width, max_height, bounds = None):
 	scaled_paths = []
 
 	for path in paths:
 		scaled_paths.append(scale_path(path, max_width, max_height, bounds))
 
-	return scale_paths
+	return scaled_paths
 
 
 def invert_path(path, max_y = None):
@@ -100,7 +95,7 @@ def invert_path(path, max_y = None):
 	return inverted_path
 
 
-def invert_all_paths(paths, max_y = None)
+def invert_all_paths(paths, max_y = None):
 	inverted_paths = []
 
 	for path in paths:

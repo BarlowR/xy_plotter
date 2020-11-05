@@ -12,7 +12,7 @@ def path_to_polygon(path, distance_threshold=-1):
 	
 	# if the threshold value isn't given, compute it based on path length. These constants seem to work relatively well in practice
 	if (distance_threshold == -1):
-		distance_threshold = int(np.sqrt(len(path))/20)+.2
+		distance_threshold = int(np.sqrt(len(path))/60)+.2
 
 	error_sum = 0
 	max_error_sum = -1
@@ -136,10 +136,10 @@ def path_to_polygon(path, distance_threshold=-1):
 
 
 #convert a list of paths into a list of polygons 			
-def paths_to_polys(paths, distance_threshold = -1)
+def paths_to_polys(paths, distance_threshold = -1):
 	polys = []
 	for path in paths:
-		polys.append(path_to_poly(path, distance_threshold))
+		polys.append(path_to_polygon(path, distance_threshold))
 	return polys
 
 

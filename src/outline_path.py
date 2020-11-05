@@ -1,6 +1,7 @@
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
+import os
 
 import path_to_poly as p2p
 
@@ -42,29 +43,35 @@ vertex_shift = {
 
 
 	#Recursively finds all paths along black/white borders within the image given, and returns them as a list of directed graphs. 	
-def outline_outer_image(img, path_num = -1, min_path_length = -1):
+def outline_outer_image(img, path_num = -1, min_path_length = -1, fig = None, start_row = 1, loading_bar = False):
 	#img is a numpy boolean array of a black and white image, where black pixels are 1 and white pixels are 0. 
 	#path_num defines max number of paths to return. 
 	#min_path_length defines the minimum path length to include in the resulting path list
+
+	if fig is not None:
+		plt.imshow(img, 'binary')
+		fig.canvas.draw()
 
 	if (min_path_length == -1): 
 		min_path_length = (img.shape[0]+img.shape[1])/5
 	path = {}
 
 	#Grab top leftmost vertex along a border
-	current_vertex = find_start_vertex(img)
+	current_vertex = find_start_vertex(img, start_row)
+	
 
-
+	if loading_bar:
+		loading_percent = 20 * start_row/img.shape[0]
+		lb = "Tracing image: \n[" + ("#" * int(loading_percent)) + (" " * (20 - int(loading_percent)))  +"]"  
+		os.system('clear')
+		print(lb)
 
 	# if there exist any pixels to trace and we don't already have enough paths, trace the outline of the path
 	#else, return an empty list
 
 	if (current_vertex is not None and path_num != 0):
 
-		if (path_num > 0):
-			print("#" * path_num)
-		else:
-			print("starting path")
+		start_row = current_vertex[1]
 
 		#setup the path tracing variables
 		first_vertex = current_vertex
@@ -130,9 +137,9 @@ def outline_outer_image(img, path_num = -1, min_path_length = -1):
 
 		# Recursively calculate the next outline
 		if path_num > 0:
-			return_list += outline_outer_image(inverted_image, path_num = path_num, min_path_length = min_path_length)
+			return_list += outline_outer_image(inverted_image, path_num = path_num, min_path_length = min_path_length, fig = fig, start_row = start_row, loading_bar = loading_bar)
 		elif path_num < 0:
-			return_list += outline_outer_image(inverted_image, min_path_length = min_path_length)
+			return_list += outline_outer_image(inverted_image, min_path_length = min_path_length, fig = fig, start_row = start_row, loading_bar = loading_bar)
 
 		return return_list
 	
@@ -147,9 +154,9 @@ def outline_outer_image(img, path_num = -1, min_path_length = -1):
 
 	
 #iterate over all pixels until we find a pixel vertex along a black/white border
-def find_start_vertex(img):
+def find_start_vertex(img, start_row):
 	rows, columns = img.shape
-	for row_index in range(1,rows):
+	for row_index in range(start_row,rows):
 		for column_index in range(1,columns):
 			a, b, c, d = get_grid((column_index, row_index), img)
 			if ((a or b or c or d ) and not (a and b and c and d)):
@@ -266,33 +273,36 @@ def cull_paths(paths, num_to_keep):
 
 
 if __name__ == "__main__":
+	f = plt.figure()
 
-	image = Image.open('image.png')
+	image = Image.open('man.jpg')
 	plt.subplot(1,2,1)
 	plt.imshow(image, 'gray')
 	img_array = img_to_bool_array(image, 180)
 	ax = plt.subplot(1,2,2)
 	plt.imshow(img_array, 'gray')
 
+	plt.ion()
+	plt.show()
+
 	
-	paths = outline_outer_image(img_array, min_path_length = 20)
+	paths = outline_outer_image(img_array, min_path_length = 3, loading_bar = True)
 
 
 	bnds = (0, 0, img_array.shape[1], img_array.shape[0])
-
-	print(bnds)
-
 	
-	total_initial_length = 0
-	total_minimized_length = 0
-	loading = ""
+	
 
-	gcode = ""
-	gcode += gci.file_header(gcode)
-
+	plt.ioff()
 	polygons = p2p.paths_to_polys(paths)
 
-	p2p.plot_polygons(polygons)
+	polygons = path_util.invert_all_paths(polygons, img_array.shape[0])
+
+	polygons = path_util.scale_all_paths(polygons, 70, 70, bnds)
+
+	p2p.plot_polygons(polygons, ax)
+
+	plt.show()
 
 
 

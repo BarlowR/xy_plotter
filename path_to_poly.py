@@ -135,10 +135,11 @@ def path_to_polygon(path, distance_threshold=-1):
 			
 
 
+
+#calculate the distance from a point to a line based on the height of the triangle formed by the point and the line
 #h = 2A/b
 #h^2 = (2A)^2 / b^2
 #https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Line_defined_by_two_points
-
 
 def dist_squared_point_to_line(P1, P2, midP):
 
@@ -152,6 +153,8 @@ def dist_squared_point_to_line(P1, P2, midP):
 
 	return area_squared_of_triangle/distance_squared_p1_to_p2
 
+
+#display the closed path as a polygon on the given matplotlib figure
 def plot_polygon(path, ax, linewidth = 2, clr = "blue"):
 	polygon = []
 	for node in path:

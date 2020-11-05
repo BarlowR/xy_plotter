@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 
 import path_to_poly as p2p
 
+import path_utility as gci
+
 
 
 
@@ -262,7 +264,7 @@ def cull_paths(paths, num_to_keep):
 
 if __name__ == "__main__":
 
-	image = Image.open('man.jpg')
+	image = Image.open('flamingo.jpg')
 	plt.subplot(1,2,1)
 	plt.imshow(image, 'gray')
 	img_array = img_to_bool_array(image, 180)
@@ -270,16 +272,21 @@ if __name__ == "__main__":
 	plt.imshow(img_array, 'gray')
 
 	
-	paths = outline_outer_image(img_array, min_path_length = 3)
+	paths = outline_outer_image(img_array, path_num = 5, min_path_length = 3)
 
 
+	bnds = (0, 0, img_array.shape[1], img_array.shape[0])
+
+	print(bnds)
+
+	
 	total_initial_length = 0
 	total_minimized_length = 0
 	loading = ""
 
 	for path in paths:
 		loading += "#"
-		print(loading + "path length " + str(len(path)))
+		print(loading + " path length " + str(len(path)))
 
 		short_path = p2p.path_to_polygon(path, 0.2)
 		total_initial_length += len(path)
@@ -288,7 +295,11 @@ if __name__ == "__main__":
 		
 		#outline_path(path, clr = (1, 0,0, 0.1))
 		
-		p2p.plot_polygon(short_path, ax)
+		#p2p.plot_polygon(short_path, ax)
+
+		inverted_path = gci.invert_path(short_path, max_y = bnds[3])
+		scaled_path = gci.scale_path(short_path, 1000, 200, bounds = bnds)
+		p2p.plot_polygon(inverted_path, ax)
 
 	print(total_minimized_length/total_initial_length)
 	plt.show()

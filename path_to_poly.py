@@ -135,6 +135,13 @@ def path_to_polygon(path, distance_threshold=-1):
 			
 
 
+#convert a list of paths into a list of polygons 			
+def paths_to_polys(paths, distance_threshold = -1)
+	polys = []
+	for path in paths:
+		polys.append(path_to_poly(path, distance_threshold))
+	return polys
+
 
 #calculate the distance from a point to a line based on the height of the triangle formed by the point and the line
 #h = 2A/b
@@ -161,4 +168,8 @@ def plot_polygon(path, ax, linewidth = 2, clr = "blue"):
 		polygon.append(np.asarray(node)-.5)
 	poly = patches.Polygon(polygon, fill = False, ls = '-', closed = True, lw = linewidth, color = clr)
 	ax.add_patch(poly)
+
+def plot_polygons(paths, ax, linewidth = 2, clr = "blue"):
+	for path in paths:
+		plot_polygon(path, ax, linewidth, clr)
 

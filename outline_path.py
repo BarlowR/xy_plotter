@@ -4,7 +4,10 @@ import matplotlib.pyplot as plt
 
 import path_to_poly as p2p
 
-import path_utility as gci
+import path_utility as path_util
+
+import gcode_interpreter as gci
+
 
 
 
@@ -264,7 +267,7 @@ def cull_paths(paths, num_to_keep):
 
 if __name__ == "__main__":
 
-	image = Image.open('flamingo.jpg')
+	image = Image.open('image.png')
 	plt.subplot(1,2,1)
 	plt.imshow(image, 'gray')
 	img_array = img_to_bool_array(image, 180)
@@ -272,7 +275,7 @@ if __name__ == "__main__":
 	plt.imshow(img_array, 'gray')
 
 	
-	paths = outline_outer_image(img_array, path_num = 5, min_path_length = 3)
+	paths = outline_outer_image(img_array, min_path_length = 20)
 
 
 	bnds = (0, 0, img_array.shape[1], img_array.shape[0])
@@ -284,7 +287,16 @@ if __name__ == "__main__":
 	total_minimized_length = 0
 	loading = ""
 
-	for path in paths:
+	gcode = ""
+	gcode += gci.file_header(gcode)
+
+	polygons = p2p.paths_to_polys(paths)
+
+	p2p.plot_polygons(polygons)
+
+
+
+	'''for path in paths:
 		loading += "#"
 		print(loading + " path length " + str(len(path)))
 
@@ -297,12 +309,14 @@ if __name__ == "__main__":
 		
 		#p2p.plot_polygon(short_path, ax)
 
-		inverted_path = gci.invert_path(short_path, max_y = bnds[3])
-		scaled_path = gci.scale_path(short_path, 1000, 200, bounds = bnds)
-		p2p.plot_polygon(inverted_path, ax)
+		inverted_path = path_util.invert_path(short_path, max_y = bnds[3])
+		scaled_path = path_util.scale_path(inverted_path, 70, 70, bounds = bnds)
+		p2p.plot_polygon(scaled_path, ax)
 
-	print(total_minimized_length/total_initial_length)
-	plt.show()
+		gcode = gci.path_to_gcode(gcode, scaled_path)
+
+	gci.write_gcode_file("test1", gcode)
+	#plt.show()
 	#print(paths)'''
 
 

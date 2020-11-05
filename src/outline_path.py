@@ -1,7 +1,6 @@
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
-import os
 
 import path_to_poly as p2p
 
@@ -62,9 +61,8 @@ def outline_outer_image(img, path_num = -1, min_path_length = -1, fig = None, st
 
 	if loading_bar:
 		loading_percent = 20 * start_row/img.shape[0]
-		lb = "Tracing image: \n[" + ("#" * int(loading_percent)) + (" " * (20 - int(loading_percent)))  +"]"  
-		os.system('clear')
-		print(lb)
+		lb = "Tracing image: [" + ("#" * int(loading_percent)) + (" " * (20 - int(loading_percent)))  +"]"  
+		print(lb, end='\r')
 
 	# if there exist any pixels to trace and we don't already have enough paths, trace the outline of the path
 	#else, return an empty list
@@ -275,7 +273,7 @@ def cull_paths(paths, num_to_keep):
 if __name__ == "__main__":
 	f = plt.figure()
 
-	image = Image.open('man.jpg')
+	image = Image.open('../pictures/man.jpg')
 	plt.subplot(1,2,1)
 	plt.imshow(image, 'gray')
 	img_array = img_to_bool_array(image, 180)

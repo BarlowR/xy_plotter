@@ -12,7 +12,7 @@ def path_to_polygon(path, distance_threshold=-1):
 	
 	# if the threshold value isn't given, compute it based on path length. These constants seem to work relatively well in practice
 	if (distance_threshold == -1):
-		distance_threshold = int(np.sqrt(len(path))/60)+.2
+		distance_threshold = np.sqrt(len(path))/60+.2
 
 	error_sum = 0
 	max_error_sum = -1

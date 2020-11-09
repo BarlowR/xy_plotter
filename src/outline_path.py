@@ -273,14 +273,13 @@ def cull_paths(paths, num_to_keep):
 if __name__ == "__main__":
 	f = plt.figure()
 
-	image = Image.open('../pictures/man.jpg')
+	image = Image.open('../pictures/method.jpg')
 	plt.subplot(1,2,1)
 	plt.imshow(image, 'gray')
-	img_array = img_to_bool_array(image, 180)
+	img_array = img_to_bool_array(image, 120)
 	ax = plt.subplot(1,2,2)
 	plt.imshow(img_array, 'gray')
 
-	plt.ion()
 	plt.show()
 
 	
@@ -301,6 +300,8 @@ if __name__ == "__main__":
 	p2p.plot_polygons(polygons, ax)
 
 	plt.show()
+
+	gci.generate_gcode("gCodeTest", polygons)
 
 
 

@@ -1,8 +1,8 @@
 # Image Trace
 
-## Overview
+## Project Context & Goals
 
-The first set of functionality I wrote for the plotter application is a set of modules for converting raster images to closed-loop polygon vector representations.  Initially I planned to implement the whole [PoTrace algorithm](http://potrace.sourceforge.net/potrace.pdf), but I ended up only using the path-construction method described in section 2.1. I chose to write my own method for converting the paths generated into optimized polygons for the sake of efficiency; the method described in the PoTrace paper is time complexity O(N^3).
+As described in the [Project Proposal](../Project Proposal.md) document, this part of the xy_plotter project is based around generating a vector representation of raster images. This particular implementation is a set of modules for converting raster images to closed-loop polygon vector representations.  Initially I planned to implement the whole [PoTrace algorithm](http://potrace.sourceforge.net/potrace.pdf), but I ended up only using the path-construction method described in section 2.1. I chose to write my own method for converting the paths generated into optimized polygons for the sake of efficiency; the method described in the PoTrace paper is time complexity O(N^3), which I thought that I could improve upon. I also chose to leave out the polygon to beizer curve translation, as the beizer curves would have to be converted back to line segments in g-code translation for the plotting robot.
 
 
 
@@ -30,17 +30,27 @@ Next we take our list of paths and pass each of the paths into the path_to_polyg
 
 <img src = "./assets/flamingo_polygon.png" width = 80%>
 
+#### gcode_interpreter.*generate_gcode()* 
+
+Finally, while not a strict part of the image trace functionality, I wrote a small module to generate g-code from the optimized polygon paths. Below is a contour drawing by Picasso that I ran through this work flow and plotted on a sticky-note. Finally, below that is the image from the outline_path.*outline_outer_image()* section plotted on another sticky note.
+
+
+
+<img src = "./assets/Picasso.jpg" width = 80%>
+
+<img src = "./assets/Rob.jpg" width = 80%>
+
+ 
+
+## Challenges & Future Work
+
+​	One particular challenge for me in this project was figuring out how to invert the image within the closed path, step 6 in the drawing above. I tried to work through an efficient way to do it, but I eventually settled on iterating through the whole image array and flipping pixels if they were between two vertical sections of path. This was fairly simple to implement, but it's a brute force method so the complexity is O(image height * width).
+
+​	Moving forward, I'm planning to continue developing out the functionality of these modules. I think that my next step will be a GUI for this workflow, followed by an expended set of options for image pro-processing. I'd also like to write some functionality for geometrically altering the paths to see if I can create some cool looking art. 
 
 
 
 
-## Constituent Modules
 
-#### outline_path
 
-* outline_outer_image (img, path_num, min_path_length, fig, start_row, loading_bar)
-
-  Takes in a 
-
-* img_to_bool_array
 

@@ -8,16 +8,9 @@ import gcode_interpreter as gci
 
 
 if __name__ == "__main__":
-
-	chars = []
-
-	for index, letter in enumerate(" abcdefghijklmnopqrstuvwxyz"):
-		if index >0:
-			padding = " " * (4-len(str(index)))
-			chars.append((letter, padding + str(index)))
 	
 	
-	letters = hti.HersheyFonts("./text_printing/hershey/hershey.txt", chars)
+	letters = hti.HersheyFonts("./text_printing/hershey/hershey.txt")
 
 	fig, ax = plt.subplots()
 		

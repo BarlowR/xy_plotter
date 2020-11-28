@@ -1,11 +1,18 @@
 class HersheyFonts:
 
-	def __init__(self, path_to_hershey, charset):
+	def __init__(self, path_to_hershey, charset = None):
 
 		hershey_font_file = open(path_to_hershey, 'r')
 		self.hershey_string_list = hershey_font_file.readlines() 
 
 		self.letter_dict = {}
+
+		charset = []
+
+		for index, letter in enumerate(" abcdefghijklmnopqrstuvwxyz"):
+			if index >0:
+				padding = " " * (4-len(str(index)))
+				charset.append((letter, padding + str(index)))
 
 		for char, line in charset:
 			self.get_letter(char, line)
@@ -24,8 +31,6 @@ class HersheyFonts:
 
 			verticies = int(line_string[5:8])
 		
-			print (line_string)
-
 			left_pos = ord(line_string[8]) - ord('R')
 			right_pos = ord(line_string[9]) - ord('R')
 
@@ -54,6 +59,8 @@ class HersheyFonts:
 			self.letter_dict[symbol] = (left_pos, right_pos, letter)
 
 
+	def word_path(self, string):
+		NotImplemented
 
 
 

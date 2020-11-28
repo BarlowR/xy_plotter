@@ -10,28 +10,35 @@ import gcode_interpreter as gci
 if __name__ == "__main__":
 	
 	
-	letters = hti.HersheyFonts("./text_printing/hershey/hershey.txt")
 
-	fig, ax = plt.subplots()
+	while True:
+		letters = hti.HersheyFonts()
+
+		fig, ax = plt.subplots()
+			
+		plt.xlim(-25, 125)
+		plt.ylim(-100, 100)
+
+		symbol = []
+		cur_x = 0
+
+		line = 0
+
+		for char in "Hello Wesley! \nFrom Rob":
+
+			if char == "\n":
+				cur_x = 0
+				line +=1
+			else:
+				start, stop, paths = letters.letter_dict[char]
+				paths = pu.translate_all_paths(paths, cur_x, line *25)
+				symbol += paths
+				cur_x += stop-start
+
 		
-	plt.xlim(0, 70)
-	plt.ylim(0, 70)
+		symbol = pu.invert_all_paths(symbol, 3)
 
-	word = []
-	cur_x = 0
-	for char in "robert":
-		start, stop, paths = letters.letter_dict[char]
-		paths = pu.translate_all_paths(paths, cur_x, 0)
-		word += paths
-		cur_x += stop-start
-	
-	word = pu.invert_all_paths(word, 3)
+		pu.plot_paths(symbol, ax)
 
-	word = pu.scale_all_paths(word, 70, 70)
+		plt.show()
 
-
-	pu.plot_paths(word, ax)
-
-	plt.show()
-
-	gci.generate_gcode("robert", word)

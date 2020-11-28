@@ -1,24 +1,25 @@
+import text_printing.bourke_interpreter as bi
+
 class HersheyFonts:
 
-	def __init__(self, path_to_hershey, charset = None):
+	def __init__(self, path_to_hershey = "./text_printing/hershey/hershey.txt", font = None):
+
 
 		hershey_font_file = open(path_to_hershey, 'r')
 		self.hershey_string_list = hershey_font_file.readlines() 
 
 		self.letter_dict = {}
 
-		charset = []
-
-		for index, letter in enumerate(" abcdefghijklmnopqrstuvwxyz"):
-			if index >0:
-				padding = " " * (4-len(str(index)))
-				charset.append((letter, padding + str(index)))
+		if font is None:
+			charset = bi.get_encoding()
+		else: 
+			charset = bi.get_encoding(font)
 
 		for char, line in charset:
-			self.get_letter(char, line)
+			self.letter_dict[char] = self.get_letter(line)
 
 
-	def get_letter(self, symbol, line):
+	def get_letter(self, line):
 
 		left_pos = 0;
 		right_pos = 0;
@@ -55,8 +56,7 @@ class HersheyFonts:
 
 			letter.append(sequence)		
 			
-
-			self.letter_dict[symbol] = (left_pos, right_pos, letter)
+			return (left_pos, right_pos, letter)
 
 
 	def word_path(self, string):

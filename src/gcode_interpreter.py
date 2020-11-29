@@ -6,7 +6,7 @@ import matplotlib.patches as patches
 #these values are in mm/min. I don't plan to include imperial units at this point
 XY_feedrate = "1500"
 XY_rapid = "2000"
-Z_feedrate = "100"
+Z_feedrate = "7"
 
 sig_figs = 6
 
@@ -18,7 +18,7 @@ def file_header(file_string):
 
 G21			; Set units to mm
 G90			; Absolute positioning
-G1 Z1 F100		; Move to clearance level
+G1 Z2 F100		; Move to clearance level
 
 
 
@@ -42,19 +42,32 @@ def path_to_gcode(file_string, path):
 	first_node = True
 
 	for node in path:
+
+		if first_node:
+			x_pos = str(node[0])
+			y_pos = str(node[1])
+		else:
+			x_pos = str(path[node][0])
+			y_pos = str(path[node][1])
+		if len(x_pos) > sig_figs: x_pos = x_pos[:sig_figs]
+		if len(y_pos) > sig_figs: y_pos = y_pos[:sig_figs]
+
 		if first_node:
 			file_string +=  (
-				"G0 Z1 F" + Z_feedrate + "\n" + 
-				"G0 X" + str(node[0])[0:sig_figs] + " Y" + str(node[1])[0:sig_figs]  + " F" + XY_rapid + "\n" +
-				"G0 Z0 F" + Z_feedrate + "\n"
+				"G0 Z2 F" + Z_feedrate + "\n" + 
+				"G0 X" +  x_pos + " Y" + y_pos  + " F" + XY_rapid + "\n" +
+				"G0 Z-1 F" + Z_feedrate + "\n"
 				)
 			first_node = False
+			x_pos = str(path[node][0])
+			y_pos = str(path[node][1])
+			if len(x_pos) > sig_figs: x_pos = x_pos[:sig_figs]
+			if len(y_pos) > sig_figs: y_pos = y_pos[:sig_figs]
 
-		x, y = path[node]
-		file_string += "G1 X" + str(x)[0:sig_figs]  + " Y" + str(y)[0:sig_figs]  + " F" + XY_feedrate + "\n"
+		file_string += "G1 X" + x_pos  + " Y" + y_pos  + " F" + XY_feedrate + "\n"
 
 	file_string += 	(
-					"G0 Z1 F" + Z_feedrate + "\n" + 
+					"G0 Z2 F" + Z_feedrate + "\n" + 
 					"; path finished" + "\n \n"
 					)
 
